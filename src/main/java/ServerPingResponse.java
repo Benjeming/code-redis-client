@@ -1,5 +1,6 @@
-import java.io.DataOutputStream;
-import java.io.IOException;
+import jdk.internal.util.xml.impl.Input;
+
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -19,6 +20,33 @@ public class ServerPingResponse {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public static void responseV2(Socket socket) {
+
+        String response = "+PONG\r\n";
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+                while (true) {
+                    String line = reader.readLine();
+                    if ("ping".equals(line)) {
+                        writer.write(response);
+                        writer.flush();
+                        break;
+                    }
+                    if (line == null) {
+                        break;
+                    }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }

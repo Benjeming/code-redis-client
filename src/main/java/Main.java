@@ -1,6 +1,7 @@
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,8 +17,19 @@ public class Main {
             serverSocket.setReuseAddress(true);
             // Wait for connection from client.
             clientSocket = serverSocket.accept();
-            ServerPingResponse.response(clientSocket);
+//            ServerPingResponse.responseV2(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                byte[] buffer = new byte[1024];
+                while (clientSocket.getInputStream().read(buffer) != -1) {
+                    clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+                    clientSocket.getOutputStream().flush();
+                    buffer = new byte[1024];
+                }
+            }
             clientSocket.close();
+
+
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         } finally {
@@ -29,5 +41,6 @@ public class Main {
                 System.out.println("IOException: " + e.getMessage());
             }
         }
+
     }
 }
